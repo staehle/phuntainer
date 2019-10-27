@@ -1,16 +1,8 @@
 {
-    "phabricator.base-uri": "localhost",
+    "phabricator.base-uri": "http://localhost",
     "mysql.host": "mariadb-phabricator",
     "mysql.port": "3306",
     "mysql.user": "root",
     "mysql.pass": "rootsecretpassword",
-    "storage.mysql-engine.max-size": "9000000",
-    "phpmailer.mailer": "smtp",
-    "phpmailer.smtp-host": "localhost",
-    "phpmailer.smtp-port": 25,
-    "phpmailer.smtp-user": "phabricator",
-    "phpmailer.smtp-password": "",
-    "phpmailer.smtp-protocol": "",
-    "metamta.mail-adapter": "PhabricatorMailImplementationPHPMailerAdapter",
-    "":""
+    "storage.mysql-engine.max-size": 9000000
 }

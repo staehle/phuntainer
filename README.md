@@ -41,6 +41,7 @@ $ docker run -d \
     -p 80:80 -p 443:443 \
     -e UPGRADE_ON_BOOT=true \
     -v /host/path/to/local.json:/phab/phabricator/conf/local/local.json \
+    -v /host/path/to/repodata:/var/repo \
     phuntainer:latest
 ```
 
@@ -48,20 +49,12 @@ Replace '/host/path/to/local.json' with a path to where you have an existing Pha
 An example local.json file:
 ```
 {
-    "phabricator.base-uri": "localhost",
+    "phabricator.base-uri": "http://localhost",
     "mysql.host": "mariadb-phabricator",
     "mysql.port": "3306",
     "mysql.user": "root",
     "mysql.pass": "rootsecretpassword",
-    "storage.mysql-engine.max-size": "9000000",
-    "phpmailer.mailer": "smtp",
-    "phpmailer.smtp-host": "localhost",
-    "phpmailer.smtp-port": 25,
-    "phpmailer.smtp-user": "phabricator",
-    "phpmailer.smtp-password": "",
-    "phpmailer.smtp-protocol": "",
-    "metamta.mail-adapter": "PhabricatorMailImplementationPHPMailerAdapter",
-    "":""
+    "storage.mysql-engine.max-size": 9000000
 }
 ```
 
@@ -80,9 +73,9 @@ docker build -t phuntainer:latest .
 
 Hey, you should follow this guide after starting Phuntainer: [https://secure.phabricator.com/book/phabricator/]
 
-Sometimes, you'll need to run some './bin/config' commands from outside the Web UI. To do this, you can use 'docker exec' to directly manipulate your running Phuntainer:
+Sometimes, you'll need to run some './bin/config' commands from outside the Web UI. To do this, you can use 'docker exec' to directly manipulate your running Phuntainer. For example:
 
 ```
-$ docker exec phabricator ./bin/auth lock
+$ docker exec phabricator ./bin/config set <key> <value>
 ```
 

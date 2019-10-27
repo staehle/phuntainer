@@ -20,7 +20,7 @@ RUN apt-get -q update \
 		libssl-dev \
 		libzip-dev \
 		mercurial \
-		python-pygments \
+		python3-pygments \
 		sendmail \
 		subversion \
 		unzip \
