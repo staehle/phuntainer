@@ -70,8 +70,19 @@ An example local.json file:
 `UPGRADE_ON_BOOT`: Set to "true" or "false". Will upgrade Phabricator and dependencies on each container start if set.
 
 
-## Creating from scratch
+## Creating Phuntainer from scratch
 ```
 cd phuntainer
 docker build -t phuntainer:latest .
 ```
+
+## Phabricator Configuration
+
+Hey, you should follow this guide after starting Phuntainer: [https://secure.phabricator.com/book/phabricator/]
+
+Sometimes, you'll need to run some './bin/config' commands from outside the Web UI. To do this, you can use 'docker exec' to directly manipulate your running Phuntainer:
+
+```
+$ docker exec phabricator ./bin/auth lock
+```
+
