@@ -97,5 +97,5 @@ EXPOSE 22 80 443
 COPY files/phun.sh /phab/phabricator/phun.sh
 
 WORKDIR /phab/phabricator
-ENTRYPOINT /phab/phabricator/phun.sh
+#ENTRYPOINT /phab/phabricator/phun.sh
 CMD /phab/phabricator/phun.sh

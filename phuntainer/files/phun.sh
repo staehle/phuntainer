@@ -10,14 +10,13 @@ if [[ "${UPGRADE_ON_BOOT}" == "true" ]]; then
     cd ${ROOT_DIR}/phabricator && git pull
 fi
 
-echo "<?php ${PREAMBLE_SCRIPT} ?>" > ${PHAB_DIR}/support/preamble.php
-chmod +x ${PHAB_DIR}/support/preamble.php
+#echo "<?php ${PREAMBLE_SCRIPT} ?>" > ${PHAB_DIR}/support/preamble.php
+#chmod +x ${PHAB_DIR}/support/preamble.php
 
-PHAB_DEFAULT_JSON=${PHAB_DIR}/conf/local/local.default
 PHAB_LOCAL_JSON=${PHAB_DIR}/conf/local/local.json
-
 if [ ! -f ${PHAB_LOCAL_JSON} ]; then
-    cp -f ${PHAB_DEFAULT_JSON} ${PHAB_LOCAL_JSON}
+    echo "Error: local.json not bind-mounted to: '${PHAB_LOCAL_JSON}'"
+	exit 1
 fi
 
 ${PHAB_DIR}/bin/storage upgrade --force
