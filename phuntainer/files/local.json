@@ -1,8 +1,19 @@
 {
-    "phabricator.base-uri": "http://localhost",
-    "mysql.host": "mariadb-phabricator",
-    "mysql.port": "3306",
-    "mysql.user": "root",
-    "mysql.pass": "rootsecretpassword",
-    "storage.mysql-engine.max-size": 9000000
+	"cluster.mailers": [
+		{
+			"key": "default-mailer",
+			"type": "sendmail"
+		}
+	],
+	"phabricator.base-uri": "http://localhost/",
+	"phabricator.timezone": "America/Chicago",
+	"metamta.default-address": "phabricator@localhost",
+	"mysql.host": "mariadb-phabricator",
+	"mysql.port": "3306",
+	"mysql.user": "root",
+	"mysql.pass": "rootsecretpassword",
+	"pygments.enabled": true,
+	"recaptcha.enabled": true,
+	"storage.mysql-engine.max-size": 9000000,
+	"ui.header-color": "dark"
 }
