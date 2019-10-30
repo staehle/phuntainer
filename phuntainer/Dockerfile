@@ -11,6 +11,7 @@ RUN apt-get -q update \
 		ftp \
 		git \
 		imagemagick \
+		iputils-ping \
 		libcurl4-openssl-dev \
 		libfreetype6-dev \
 		libjpeg-dev \
@@ -20,10 +21,12 @@ RUN apt-get -q update \
 		libssl-dev \
 		libzip-dev \
 		mercurial \
+		openssh-server \
 		python3-pygments \
 		sendmail \
 		subversion \
 		unzip \
+		vim \
 		wget \
 		zip \
 	&& rm -rf /var/lib/apt/lists/*
@@ -50,52 +53,39 @@ RUN docker-php-ext-configure gd \
 		sockets \
 		zip
 
-# set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
-# RUN mkdir -p /usr/local/etc/php/conf.d \
-#     && { \
-#         echo 'opcache.memory_consumption=128'; \
-#         echo 'opcache.interned_strings_buffer=8'; \
-#         echo 'opcache.max_accelerated_files=4000'; \
-#         echo 'opcache.revalidate_freq=60'; \
-#         echo 'opcache.fast_shutdown=1'; \
-#         # From Phabricator
-#         echo 'opcache.validate_timestamps=0'; \
-#     } > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-# Set the default timezone.
-# RUN { \
-#         echo 'date.timezone="UTC"'; \
-#     } > /usr/local/etc/php/conf.d/timezone.ini
-
-# File Uploads
-# RUN { \
-#         echo 'post_max_size=32M'; \
-#         echo 'upload_max_filesize=32M'; \
-#     } > /usr/local/etc/php/conf.d/uploads.ini
+# Install PHP config files
+RUN mkdir -p /usr/local/etc/php/conf.d
+# https://secure.php.net/manual/en/opcache.installation.php
+COPY files/opcache-recommended.ini /usr/local/etc/php/conf.d/opcache-recommended.ini
+COPY files/timezone.ini /usr/local/etc/php/conf.d/timezone.ini
+COPY files/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # Install apache mod rewrite
 RUN a2enmod rewrite
 
 # Phab source, 'stable' branch for all
-RUN mkdir /phab \
-	&& git clone --branch stable https://github.com/phacility/libphutil.git /phab/libphutil \
-	&& git clone --branch stable https://github.com/phacility/arcanist.git /phab/arcanist \
-	&& git clone --branch stable https://github.com/phacility/phabricator.git /phab/phabricator
+RUN git clone --branch stable https://github.com/phacility/libphutil.git /libphutil
+RUN git clone --branch stable https://github.com/phacility/arcanist.git /arcanist
+RUN git clone --branch stable https://github.com/phacility/phabricator.git /phabricator
+
+# Let's Encrypt
+RUN git clone https://github.com/letsencrypt/letsencrypt /letsencrypt
+# cd /srv/letsencrypt
+# ./letsencrypt-auto-source/letsencrypt-auto --help
+# cd /
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default
 COPY files/site.conf /etc/apache2/sites-available/phab.conf
 RUN a2ensite phab
 
-COPY files/local.json /phab/phabricator/conf/local/local.default
+COPY files/local.json /phabricator/conf/local/local.default
 
-ENV PATH "$PATH:/phab/phabricator/bin"
+ENV PATH "$PATH:/phabricator/bin"
 
 EXPOSE 22 80 443
 
-COPY files/phun.sh /phab/phabricator/phun.sh
+COPY files/phun.sh /phabricator/phun.sh
 
-WORKDIR /phab/phabricator
-#ENTRYPOINT /phab/phabricator/phun.sh
-CMD /phab/phabricator/phun.sh
+WORKDIR /phabricator
+CMD /phabricator/phun.sh

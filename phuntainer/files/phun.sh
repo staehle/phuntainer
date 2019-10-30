@@ -1,13 +1,12 @@
 #!/bin/bash
 set -ex
 
-ROOT_DIR=/phab
-PHAB_DIR=${ROOT_DIR}/phabricator
+PHAB_DIR=/phabricator
 
-if [[ "${UPGRADE_ON_BOOT}" == "true" ]]; then
-    cd ${ROOT_DIR}/libphutil && git pull
-    cd ${ROOT_DIR}/arcanist && git pull
-    cd ${ROOT_DIR}/phabricator && git pull
+if [ -z "${DO_NOT_UPGRADE_ON_BOOT}" ]; then
+    git -C /libphutil pull
+    git -C /arcanist pull
+    git -C /phabricator pull
 fi
 
 #echo "<?php ${PREAMBLE_SCRIPT} ?>" > ${PHAB_DIR}/support/preamble.php
@@ -18,6 +17,11 @@ if [ ! -f ${PHAB_LOCAL_JSON} ]; then
     echo "Error: local.json not bind-mounted to: '${PHAB_LOCAL_JSON}'"
 	exit 1
 fi
+
+echo "SQL server config:"
+${PHAB_DIR}/bin/config get mysql.host
+
+ping phabsql -c 5
 
 ${PHAB_DIR}/bin/storage upgrade --force
 ${PHAB_DIR}/bin/phd start

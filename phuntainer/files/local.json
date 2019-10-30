@@ -1,19 +1,18 @@
 {
-	"cluster.mailers": [
-		{
-			"key": "default-mailer",
-			"type": "sendmail"
-		}
-	],
-	"phabricator.base-uri": "http://localhost/",
-	"phabricator.timezone": "America/Chicago",
-	"metamta.default-address": "phabricator@localhost",
-	"mysql.host": "mariadb-phabricator",
-	"mysql.port": "3306",
-	"mysql.user": "root",
-	"mysql.pass": "rootsecretpassword",
-	"pygments.enabled": true,
-	"recaptcha.enabled": true,
-	"storage.mysql-engine.max-size": 9000000,
-	"ui.header-color": "dark"
+  "cluster.mailers": [
+    {
+      "key": "default-mailer",
+      "type": "sendmail"
+    }
+  ],
+  "metamta.default-address": "phabricator@localhost",
+  "mysql.host": "phabsql",
+  "mysql.user": "root",
+  "mysql.pass": "rpass12345",
+  "phabricator.base-uri": "http://127.0.0.1/",
+  "phabricator.timezone": "America/Chicago",
+  "pygments.enabled": true,
+  "recaptcha.enabled": true,
+  "storage.mysql-engine.max-size": 67108864,
+  "ui.header-color": "dark"
 }
