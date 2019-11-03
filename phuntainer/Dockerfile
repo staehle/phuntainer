@@ -59,6 +59,7 @@ RUN mkdir -p /usr/local/etc/php/conf.d
 COPY files/opcache-recommended.ini /usr/local/etc/php/conf.d/opcache-recommended.ini
 COPY files/timezone.ini /usr/local/etc/php/conf.d/timezone.ini
 COPY files/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY files/phpexcel.ini /usr/local/etc/php/conf.d/phpexcel.ini
 
 # Install apache mod rewrite
 RUN a2enmod rewrite
@@ -71,23 +72,22 @@ RUN git clone https://www.github.com/PHPOffice/PHPExcel.git /PHPExcel
 
 # Phabricator users
 # www-data is default apache user and will reuse. 'phabricator' is new user for both VCS and PHD
-RUN echo "phabricator:x:2123:2123:PhabricatorDaemonUser:/home/phabricator:/bin/bash" >> /etc/passwd
+RUN mkdir -p /home/daemonuser
+RUN echo "phabricator:x:4321:4321:DaemonUser:/home/daemonuser:/bin/bash" >> /etc/passwd
 # Phabricator group
-RUN echo "phabricator:!:2123:www-data,root,phabricator" >> /etc/group
-RUN mkdir -p /home/phabricator
-RUN chown phabricator:phabricator /home/phabricator
-
-# Let's Encrypt
-# RUN git clone https://github.com/letsencrypt/letsencrypt /home/phabricator/letsencrypt
-# /home/phabricato/letsencrypt/letsencrypt-auto-source/letsencrypt-auto --help
+RUN echo "phabricator:!:4321:phabricator,www-data,root" >> /etc/group
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default
 COPY files/site.conf /etc/apache2/sites-available/phab.conf
 RUN a2ensite phab
 
-COPY files/local.json /phabricator/conf/local/local.default
+# Configurations
+COPY files/local.json /phabricator/conf/example/local.conf
+RUN rm -rf /phabricator/conf/local
+RUN ln -s /phabricator/conf/local /config/local
 
+# Runtime
 ENV PATH "$PATH:/phabricator/bin"
 
 EXPOSE 80 443 22

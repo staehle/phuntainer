@@ -48,9 +48,31 @@ Of course, you can use the MySQL container instead of MariaDB if you'd like.
 
 ### The actual Phuntainer!
 
-Before starting Phuntainer, create a file in ```${HOST_STORAGE_PATH}/local.json``` and fill it with at minimum MySQL configurations. And example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json)
+#### Volumes and Configuration
 
-Create the Phuntainer container:
+Required volumes:
+
+* ```${HOST_STORAGE_PATH}/config``` to ```/config``` -- Persistent storage for configuration
+* ```${HOST_STORAGE_PATH}/repodata``` to ```/var/repo``` -- Persistent storage for repositories
+
+Optional volumes:
+
+* ```${HOST_STORAGE_PATH}/extensions``` to ```/phabricator/src/extensions``` -- If you have Phabricator PHP extensions, put them here
+
+Before starting Phuntainer, create a file in ```${HOST_STORAGE_PATH}/config/local/local.json``` and fill it with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json), which is copied to ```/config/local/local.json``` if it doesn't exist.
+
+#### Environment Variables
+
+```PUID```: Set this variable to the host Unix user ID. This will be used for file permissions.
+
+```GUID```: If your group ID is different, set this variable. Otherwise PUID will be assumed.
+
+```USERNAME```: By default, the container user "phabricator" will be assigned the IDs above. This username will also be used as the SSH user. Set this to something else if you'd like.
+
+```DO_NOT_UPGRADE_ON_BOOT```: If set to any value, will **skip** the upgrading process for Phabricator and dependencies on container start.
+
+#### Start the Phuntainer!
+
 ```
 $ docker run -d \
     --name phabricator \
@@ -58,23 +80,19 @@ $ docker run -d \
     --restart=unless-stopped \
     -p 80:80 \
     -p 443:443 \
-    -v ${HOST_STORAGE_PATH}/local.json:/phabricator/conf/local/local.json \
-    -v ${HOST_STORAGE_PATH}/extensions:/phabricator/src/extensions \
+    -p 22:22 \
+    -e PUID=1000 \
+    -e USERNAME=git \
+    -v ${HOST_STORAGE_PATH}/config:/config \
     -v ${HOST_STORAGE_PATH}/repodata:/var/repo \
     staehle/phuntainer:latest
 ```
-
-
-### Phuntainer Environment Variable Configuration
-
-`DO_NOT_UPGRADE_ON_BOOT`: If set to any value, will **skip** the upgrading process for Phabricator and dependencies on container start.
-
 
 ## Phabricator Configuration
 
 Hey, you should follow this guide after starting Phuntainer: [Official Phabricator User Documentation](https://secure.phabricator.com/book/phabricator/)
 
-Sometimes, you'll need to run some './bin/config' commands from outside the Web UI. To do this, you can use 'docker exec' to directly manipulate your running Phuntainer. For example:
+Sometimes, you'll need to run some './bin/config' commands from outside the Web UI. To do this, you can use 'docker exec' to directly manipulate your running Phuntainer. For example, if you used 'phabricator' for the container name above:
 
 ```
 $ docker exec phabricator ./bin/config set <key> <value>
