@@ -1,1 +1,1 @@
-docker build -t staehle/phuntainer:latest  .
+docker build -t staehle/phuntainer:latest --network=host .

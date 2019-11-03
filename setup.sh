@@ -1,7 +1,7 @@
 #!/bin/bash
 # set these two variables:
-PHAB_NETWORK_NAME=phabnet
-HOST_STORAGE_PATH=/opt/phabricator
+PHAB_NETWORK_NAME=
+HOST_STORAGE_PATH=
 
 ### do not edit past this line
 if [[ -z "${PHAB_NETWORK_NAME}" || -z "${HOST_STORAGE_PATH}" ]]; then
