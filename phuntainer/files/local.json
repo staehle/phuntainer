@@ -5,14 +5,16 @@
       "type": "sendmail"
     }
   ],
+  "diffusion.allow-git-lfs": true,
+  "diffusion.ssh-port": 22,
+  "diffusion.ssh-user": "phabricator",
   "metamta.default-address": "phabricator@localhost",
   "mysql.host": "phabsql",
   "mysql.user": "root",
   "mysql.pass": "rpass12345",
   "phabricator.base-uri": "http://127.0.0.1/",
   "phabricator.timezone": "America/Chicago",
+  "phd.user": "phabricator",
   "pygments.enabled": true,
-  "recaptcha.enabled": true,
-  "storage.mysql-engine.max-size": 67108864,
-  "ui.header-color": "dark"
+  "storage.mysql-engine.max-size": 67108864
 }

@@ -67,12 +67,19 @@ RUN a2enmod rewrite
 RUN git clone --branch stable https://github.com/phacility/libphutil.git /libphutil
 RUN git clone --branch stable https://github.com/phacility/arcanist.git /arcanist
 RUN git clone --branch stable https://github.com/phacility/phabricator.git /phabricator
+RUN git clone https://www.github.com/PHPOffice/PHPExcel.git /PHPExcel
+
+# Phabricator users
+# www-data is default apache user and will reuse. 'phabricator' is new user for both VCS and PHD
+RUN echo "phabricator:x:2123:2123:PhabricatorDaemonUser:/home/phabricator:/bin/bash" >> /etc/passwd
+# Phabricator group
+RUN echo "phabricator:!:2123:www-data,root,phabricator" >> /etc/group
+RUN mkdir -p /home/phabricator
+RUN chown phabricator:phabricator /home/phabricator
 
 # Let's Encrypt
-RUN git clone https://github.com/letsencrypt/letsencrypt /letsencrypt
-# cd /srv/letsencrypt
-# ./letsencrypt-auto-source/letsencrypt-auto --help
-# cd /
+# RUN git clone https://github.com/letsencrypt/letsencrypt /home/phabricator/letsencrypt
+# /home/phabricato/letsencrypt/letsencrypt-auto-source/letsencrypt-auto --help
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default
@@ -83,7 +90,7 @@ COPY files/local.json /phabricator/conf/local/local.default
 
 ENV PATH "$PATH:/phabricator/bin"
 
-EXPOSE 22 80 443
+EXPOSE 80 443 22
 
 COPY files/phun.sh /phabricator/phun.sh
 

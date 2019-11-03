@@ -1,22 +1,39 @@
 #!/bin/bash
 set -ex
 
-PHAB_DIR=/phabricator
+DEFAULT_UID=2123
+PHAB_USERNAME=phabricator
+
+ROOT_DIR=/
+PHAB_DIR=${ROOT_DIR}/phabricator
+PHAB_LOCAL_JSON=${PHAB_DIR}/conf/local/local.json
+REPO_DIR=/var/repo
 
 if [ -z "${DO_NOT_UPGRADE_ON_BOOT}" ]; then
-    git -C /libphutil pull
-    git -C /arcanist pull
-    git -C /phabricator pull
+    git -C ${ROOT_DIR}/libphutil pull
+    git -C ${ROOT_DIR}/arcanist pull
+    git -C ${ROOT_DIR}/phabricator pull
 fi
 
-#echo "<?php ${PREAMBLE_SCRIPT} ?>" > ${PHAB_DIR}/support/preamble.php
-#chmod +x ${PHAB_DIR}/support/preamble.php
-
-PHAB_LOCAL_JSON=${PHAB_DIR}/conf/local/local.json
 if [ ! -f ${PHAB_LOCAL_JSON} ]; then
     echo "Error: local.json not bind-mounted to: '${PHAB_LOCAL_JSON}'"
 	exit 1
 fi
+if [ ! -d ${REPO_DIR} ]; then
+    echo "Error: ${REPO_DIR} was not bind-mounted!"
+    exit 1
+fi
+
+# Update UID/GID
+if [ ! -z "${PUID}" ]; then
+    if [ -z "${GUID}" ]; then
+        # If group not specified, use PID
+        GUID=$PUID
+    fi
+    sed -i "s/phabricator/"
+fi
+
+chown phabricator:phabricator /var/repo
 
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host
