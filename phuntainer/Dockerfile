@@ -25,6 +25,7 @@ RUN apt-get -q update \
 		python3-pygments \
 		sendmail \
 		subversion \
+		sudo \
 		unzip \
 		vim \
 		wget \
