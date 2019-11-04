@@ -83,9 +83,8 @@ COPY files/site.conf /etc/apache2/sites-available/phab.conf
 RUN a2ensite phab
 
 # Configurations
-COPY files/local.json /phabricator/conf/example/local.conf
-RUN rm -rf /phabricator/conf/local
-RUN ln -s /phabricator/conf/local /config/local
+COPY files/local.json /phabricator/conf/example/local.json
+COPY files/preamble.php /phabricator/conf/example/preamble.php
 
 # Runtime
 ENV PATH "$PATH:/phabricator/bin"

@@ -6,7 +6,8 @@ DEFAULT_USERNAME=phabricator
 
 CONF_DIR=/config
 PHAB_DIR=/phabricator
-PHAB_LOCAL_JSON=${PHAB_DIR}/conf/local/local.json
+PHAB_LOCAL_JSON=${CONF_DIR}/local/local.json
+PHAB_PREAMBLE=${CONF_DIR}/preamble.php
 REPO_DIR=/var/repo
 
 if [ -z "${DO_NOT_UPGRADE_ON_BOOT}" ]; then
@@ -54,14 +55,19 @@ chown -R ${USERNAME}:${USERNAME} /PHPExcel
 chown -R ${USERNAME}:${USERNAME} ${REPO_DIR}
 
 # Configurations
+mkdir -p /config/local
+mkdir -p /config/extensions
 if [ ! -f ${PHAB_LOCAL_JSON} ]; then
-    echo "local.json not found! Copying default to: '${PHAB_LOCAL_JSON}'"
-    mkdir -p /config/local
-	cp ${PHAB_DIR}/conf/example/local.conf /config/local/local.json
-    if [ ! -f ${PHAB_LOCAL_JSON} ]; then
-        echo "ayyy the symlink at /phabricator/conf/local to /config/local broke"
-    fi
+    cp ${PHAB_DIR}/conf/example/local.json ${PHAB_LOCAL_JSON}
 fi
+if [ ! -f ${PHAB_PREAMBLE} ]; then
+    cp ${PHAB_DIR}/conf/example/preamble.php ${PHAB_PREAMBLE} 
+fi
+# Make sure symlinks exist
+rm -rf ${PHAB_DIR}/conf/local
+rm -rf ${PHAB_DIR}/support
+ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
+ln -s ${CONF_DIR}/preamble.php ${PHAB_DIR}/support/preamble.php
 
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host

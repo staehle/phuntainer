@@ -48,28 +48,33 @@ Of course, you can use the MySQL container instead of MariaDB if you'd like.
 
 ### The actual Phuntainer!
 
-#### Volumes and Configuration
+#### Volumes
 
-Required volumes:
+| Host Path | Container Path | Usage |
+|-|-|-|
+| `${HOST_STORAGE_PATH}/config` | `/config` | _(Required)_ Persistent storage for configuration. See 'Configuration Directory' section below. |
+| `${HOST_STORAGE_PATH}/repodata` | `/var/repo` | _(Required)_ Persistent storage for repositories |
 
-* ```${HOST_STORAGE_PATH}/config``` to ```/config``` -- Persistent storage for configuration
-* ```${HOST_STORAGE_PATH}/repodata``` to ```/var/repo``` -- Persistent storage for repositories
+#### Configuration files
 
-Optional volumes:
+Your configuration directory needs these items:
 
-* ```${HOST_STORAGE_PATH}/extensions``` to ```/phabricator/src/extensions``` -- If you have Phabricator PHP extensions, put them here
+* `${HOST_STORAGE_PATH}/config/`
+  * `local/` -- _(Required)_ Subdirectory to hold config data
+    * `local.json` -- _(Required)_ Local configuration for Phabricator -- Fill it with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json), which is copied at container start if it doesn't exist.
+  * `preamble.php` -- _(Optional)_ Phabricator Preamble PHP file. This may not apply to your situation. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/configuring_preamble/)
+  * `extensions/` -- _(Optional)_ If you have Phabricator PHP extensions, put them in this subdirectory.
 
-Before starting Phuntainer, create a file in ```${HOST_STORAGE_PATH}/config/local/local.json``` and fill it with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json), which is copied to ```/config/local/local.json``` if it doesn't exist.
 
 #### Environment Variables
 
-```PUID```: Set this variable to the host Unix user ID. This will be used for file permissions.
+`PUID`: Set this variable to the host Unix user ID. This will be used for file permissions.
 
-```GUID```: If your group ID is different, set this variable. Otherwise PUID will be assumed.
+`GUID`: If your group ID is different, set this variable. Otherwise PUID will be assumed.
 
-```USERNAME```: By default, the container user "phabricator" will be assigned the IDs above. This username will also be used as the SSH user. Set this to something else if you'd like.
+`USERNAME`: By default, the container user "phabricator" will be assigned the IDs above. This username will also be used as the SSH user. Set this to something else if you'd like.
 
-```DO_NOT_UPGRADE_ON_BOOT```: If set to any value, will **skip** the upgrading process for Phabricator and dependencies on container start.
+`DO_NOT_UPGRADE_ON_BOOT`: If set to any value, will **skip** the upgrading process for Phabricator and dependencies on container start.
 
 #### Start the Phuntainer!
 
