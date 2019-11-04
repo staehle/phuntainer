@@ -70,12 +70,12 @@ RUN git clone --branch stable https://github.com/phacility/arcanist.git /arcanis
 RUN git clone --branch stable https://github.com/phacility/phabricator.git /phabricator
 RUN git clone https://www.github.com/PHPOffice/PHPExcel.git /PHPExcel
 
-# Phabricator users
-# www-data is default apache user and will reuse. 'phabricator' is new user for both VCS and PHD
+# Phabricator user
+# www-data is default apache user and will reuse. 'ph' is new user for both VCS and PHD
 RUN mkdir -p /home/daemonuser
-RUN echo "phabricator:x:4321:4321:DaemonUser:/home/daemonuser:/bin/bash" >> /etc/passwd
-# Phabricator group
-RUN echo "phabricator:!:4321:phabricator,www-data,root" >> /etc/group
+RUN echo "ph:x:4321:4321:DaemonUser:/home/daemonuser:/bin/bash" >> /etc/passwd
+# Phabricator group, add apache user
+RUN echo "ph:!:4321:www-data" >> /etc/group
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default

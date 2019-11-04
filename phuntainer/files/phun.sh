@@ -2,7 +2,7 @@
 set -ex
 
 DEFAULT_UID=4321
-DEFAULT_USERNAME=phabricator
+USERNAME=ph
 
 CONF_DIR=/config
 PHAB_DIR=/phabricator
@@ -35,13 +35,13 @@ else
     PUID=${DEFAULT_UID}
     GUID=${DEFAULT_UID}
 fi
-if [ -z "${USERNAME}" ]; then
-    USERNAME=${DEFAULT_USERNAME}
-fi
+# if [ -z "${USERNAME}" ]; then
+#     USERNAME=${DEFAULT_USERNAME}
+# fi
 
 # Set given user/id values
-sed -i "s/phabricator:x:4321:4321/${USERNAME}:x:${PUID}:${GUID}/g" /etc/passwd
-sed -i "s/phabricator:!:4321:phabricator,/${USERNAME}:!:${GUID}:${USERNAME},/g" /etc/group
+sed -i "s/${USERNAME}:x:4321:4321/${USERNAME}:x:${PUID}:${GUID}/g" /etc/passwd
+sed -i "s/${USERNAME}:!:4321:/${USERNAME}:!:${GUID}:/g" /etc/group
 echo "USER/ID/GID values:"
 cat /etc/passwd | grep ${USERNAME}
 cat /etc/group | grep ${USERNAME}

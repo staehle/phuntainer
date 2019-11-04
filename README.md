@@ -39,9 +39,9 @@ $ docker run -d \
     mariadb:10.4 --local-infile=0 --max_allowed_packet=64M
 ```
 
-Replace '${HOST_STORAGE_PATH}/sql' with a path to where you want the SQL storage to be, or use a Docker volume instead. Make sure it is set to _something_ though, so the database will persist across container re/starts.
+Replace `${HOST_STORAGE_PATH}/sql` with a path to where you want the SQL storage to be, or use a Docker volume instead. Make sure it is set to _something_ though, so the database will persist across container re/starts.
 
-Currently, this is configured for Phabricator to use the 'root' database user. I tried a setup with a separate SQL user account, but the Phabricator 'bin/storage' doesn't assist with separate user permissions for some reason?! Asinine, and I'll consider that an upstream issue, and therefore not worth my time to fix. If you'd like to submit a Pull Request that solves this, I'll consider it :)
+Currently, this is configured for Phabricator to use the `root` database user. I tried a setup with a separate SQL user account, but the Phabricator `bin/storage` application doesn't assist with separate user permissions for some reason?! Asinine, and I'll consider that an upstream issue, and therefore not worth my time to fix. If you'd like to submit a Pull Request that solves this, I'll consider it :)
 
 Of course, you can use the MySQL container instead of MariaDB if you'd like.
 
@@ -68,11 +68,9 @@ Your configuration directory needs these items:
 
 #### Environment Variables
 
-`PUID`: Set this variable to the host Unix user ID. This will be used for file permissions.
+`PUID`: Set this variable to the host Unix user ID. This will be set as the user ID for the `ph` user, which runs PHD and used for SSH, as well as file permissions on the host.
 
 `GUID`: If your group ID is different, set this variable. Otherwise PUID will be assumed.
-
-`USERNAME`: By default, the container user "phabricator" will be assigned the IDs above. This username will also be used as the SSH user. Set this to something else if you'd like.
 
 `DO_NOT_UPGRADE_ON_BOOT`: If set to any value, will **skip** the upgrading process for Phabricator and dependencies on container start.
 
@@ -87,7 +85,7 @@ $ docker run -d \
     -p 443:443 \
     -p 22:22 \
     -e PUID=1000 \
-    -e USERNAME=git \
+    -e GUID=1000 \
     -v ${HOST_STORAGE_PATH}/config:/config \
     -v ${HOST_STORAGE_PATH}/repodata:/var/repo \
     staehle/phuntainer:latest
