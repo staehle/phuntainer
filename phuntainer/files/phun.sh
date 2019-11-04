@@ -43,8 +43,8 @@ fi
 sed -i "s/${USERNAME}:x:4321:4321/${USERNAME}:x:${PUID}:${GUID}/g" /etc/passwd
 sed -i "s/${USERNAME}:!:4321:/${USERNAME}:!:${GUID}:/g" /etc/group
 echo "USER/ID/GID values:"
-cat /etc/passwd | grep ${USERNAME}
-cat /etc/group | grep ${USERNAME}
+cat /etc/passwd | grep ${USERNAME}:
+cat /etc/group | grep ${USERNAME}:
 echo
 
 # Give ownership of directories
@@ -55,19 +55,19 @@ chown -R ${USERNAME}:${USERNAME} /PHPExcel
 chown -R ${USERNAME}:${USERNAME} ${REPO_DIR}
 
 # Configurations
-mkdir -p /config/local
-mkdir -p /config/extensions
+sudo -u ${USERNAME} mkdir -p /config/local
+sudo -u ${USERNAME} mkdir -p /config/extensions
 if [ ! -f ${PHAB_LOCAL_JSON} ]; then
-    cp ${PHAB_DIR}/conf/example/local.json ${PHAB_LOCAL_JSON}
+    sudo -u ${USERNAME} cp ${PHAB_DIR}/conf/example/local.json ${PHAB_LOCAL_JSON}
 fi
 if [ ! -f ${PHAB_PREAMBLE} ]; then
-    cp ${PHAB_DIR}/conf/example/preamble.php ${PHAB_PREAMBLE} 
+    sudo -u ${USERNAME} cp ${PHAB_DIR}/conf/example/preamble.php ${PHAB_PREAMBLE}
 fi
 # Make sure symlinks exist
 rm -rf ${PHAB_DIR}/conf/local
-rm -rf ${PHAB_DIR}/support
-ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
-ln -s ${CONF_DIR}/preamble.php ${PHAB_DIR}/support/preamble.php
+rm -f ${PHAB_DIR}/support/preamble.php
+sudo -u ${USERNAME} ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
+sudo -u ${USERNAME} ln -s ${PHAB_PREAMBLE} ${PHAB_DIR}/support/preamble.php
 
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host
