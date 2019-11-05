@@ -86,6 +86,8 @@ RUN a2ensite phab
 # Configurations
 COPY files/local.json /phabricator/conf/example/local.json
 COPY files/preamble.php /phabricator/conf/example/preamble.php
+COPY files/sshd_config /phabricator/conf/example/sshd_config
+COPY files/phabricator-ssh-hook.sh /phabricator/conf/example/phabricator-ssh-hook.sh
 
 # Runtime
 ENV PATH "$PATH:/phabricator/bin"

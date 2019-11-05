@@ -6,9 +6,15 @@ USERNAME=ph
 
 CONF_DIR=/config
 PHAB_DIR=/phabricator
+REPO_DIR=/var/repo
+EXAMPLE_CONFIG_DIR=${PHAB_DIR}/conf/example/
+
 PHAB_LOCAL_JSON=${CONF_DIR}/local/local.json
 PHAB_PREAMBLE=${CONF_DIR}/preamble.php
-REPO_DIR=/var/repo
+PHAB_SSH_CONF=${CONF_DIR}/sshd_config
+
+PHAB_SSH_SHHH=${CONF_DIR}/ssh-secret
+PHAB_SSH_HOOK=${PHAB_SSH_SHHH}/phabricator-ssh-hook.sh
 
 if [ -z "${DO_NOT_UPGRADE_ON_BOOT}" ]; then
     git -C /libphutil pull
@@ -58,12 +64,23 @@ chown -R ${USERNAME}:${USERNAME} ${REPO_DIR}
 sudo -u ${USERNAME} mkdir -p /config/local
 sudo -u ${USERNAME} mkdir -p /config/extensions
 if [ ! -f ${PHAB_LOCAL_JSON} ]; then
-    sudo -u ${USERNAME} cp ${PHAB_DIR}/conf/example/local.json ${PHAB_LOCAL_JSON}
+    sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/local.json ${PHAB_LOCAL_JSON}
 fi
 if [ ! -f ${PHAB_PREAMBLE} ]; then
-    sudo -u ${USERNAME} cp ${PHAB_DIR}/conf/example/preamble.php ${PHAB_PREAMBLE}
+    sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/preamble.php ${PHAB_PREAMBLE}
 fi
-# Make sure symlinks exist
+if [ ! -f ${PHAB_SSH_CONF} ]; then
+    sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/sshd_config ${PHAB_SSH_CONF}
+fi
+# NOTE: The phabricator-ssh-hook.sh file MUST be owned by root with 755 perms or SSHD will refuse it.
+mkdir -p ${PHAB_SSH_SHHH}
+if [ ! -f ${PHAB_SSH_HOOK} ]; then
+    sudo cp ${EXAMPLE_CONFIG_DIR}/phabricator-ssh-hook.sh ${PHAB_SSH_HOOK}
+fi
+chown root:root -R ${PHAB_SSH_SHHH}
+chmod 755 ${PHAB_SSH_HOOK}
+
+# Make sure symlinks exist for non-movable config items:
 rm -rf ${PHAB_DIR}/conf/local
 rm -f ${PHAB_DIR}/support/preamble.php
 sudo -u ${USERNAME} ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
@@ -72,8 +89,13 @@ sudo -u ${USERNAME} ln -s ${PHAB_PREAMBLE} ${PHAB_DIR}/support/preamble.php
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host
 
-ping phabsql -c 5
-
+echo "Running SQL Checks"
+# ping phabsql -c 3
 ${PHAB_DIR}/bin/storage upgrade --force
+
+echo "Starting SSH Services"
+sshd -f ${PHAB_SSH_CONF}
+
+echo "Starting Phabricator"
 sudo -u ${USERNAME} ${PHAB_DIR}/bin/phd start
 apache2-foreground

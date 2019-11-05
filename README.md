@@ -51,19 +51,23 @@ Of course, you can use the MySQL container instead of MariaDB if you'd like.
 #### Volumes
 
 | Host Path | Container Path | Usage |
-|-|-|-|
-| `${HOST_STORAGE_PATH}/config` | `/config` | _(Required)_ Persistent storage for configuration. See 'Configuration Directory' section below. |
-| `${HOST_STORAGE_PATH}/repodata` | `/var/repo` | _(Required)_ Persistent storage for repositories |
+|---|---|---|
+| `${HOST_STORAGE_PATH}/config` | `/config` | Persistent storage for configuration. See 'Configuration Directory' section below. |
+| `${HOST_STORAGE_PATH}/repodata` | `/var/repo` | Persistent storage for repositories |
 
 #### Configuration files
 
-Your configuration directory needs these items:
+Your configuration directory should have this tree layout. If any items are missing, a default/example copy of the file will be copied on container boot which you can then edit.
 
 * `${HOST_STORAGE_PATH}/config/`
-  * `local/` -- _(Required)_ Subdirectory to hold config data
-    * `local.json` -- _(Required)_ Local configuration for Phabricator -- Fill it with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json), which is copied at container start if it doesn't exist.
-  * `preamble.php` -- _(Optional)_ Phabricator Preamble PHP file. This may not apply to your situation. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/configuring_preamble/)
-  * `extensions/` -- _(Optional)_ If you have Phabricator PHP extensions, put them in this subdirectory.
+  * `local/` -- Subdirectory to hold config data
+    * `local.json` -- Local configuration for Phabricator. Recommended to create this file initially, with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json). **NOTE** the example file has some required settings, such as `diffusion.ssh-user` and `phd.user` set to "ph", reflecting the username value used across many files in this repo.
+  * `extensions/` -- If you have Phabricator PHP extensions, put them in this subdirectory.
+  * `preamble.php` -- Phabricator Preamble PHP file. This may not apply to your situation. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/configuring_preamble/)
+  * `sshd_config` -- For Git SSHD usage. The default file should be enough for most scenarios, and exposes default SSH port 22. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/diffusion_hosting/)
+  * `ssh-secret/` -- Also for SSHD, contains permission-sensitive items. This is the only directory owned by `root`.
+    * `phabricator-ssh-hook.sh` -- The Phabricator SSHD Hook file
+
 
 
 #### Environment Variables
