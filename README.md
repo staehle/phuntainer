@@ -64,9 +64,7 @@ Your configuration directory should have this tree layout. If any items are miss
     * `local.json` -- Local configuration for Phabricator. Recommended to create this file initially, with at minimum MySQL configurations. An example local.json file is in this repo's [phuntainer/files/local.json](https://github.com/staehle/phuntainer/blob/master/phuntainer/files/local.json). **NOTE** the example file has some required settings, such as `diffusion.ssh-user` and `phd.user` set to "ph", reflecting the username value used across many files in this repo.
   * `extensions/` -- If you have Phabricator PHP extensions, put them in this subdirectory.
   * `preamble.php` -- Phabricator Preamble PHP file. This may not apply to your situation. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/configuring_preamble/)
-  * `sshd_config` -- For Git SSHD usage. The default file should be enough for most scenarios, and exposes default SSH port 22. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/diffusion_hosting/)
-  * `ssh-secret/` -- Also for SSHD, contains permission-sensitive items. This is the only directory owned by `root`.
-
+  * `ssh-secret/` -- Contains SSH keys for persistence.
 
 
 #### Environment Variables

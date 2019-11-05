@@ -7,11 +7,10 @@ USERNAME=ph
 CONF_DIR=/config
 PHAB_DIR=/phabricator
 REPO_DIR=/var/repo
-EXAMPLE_CONFIG_DIR=${PHAB_DIR}/conf/example/
+EXAMPLE_CONFIG_DIR=${PHAB_DIR}/conf/example
 
 PHAB_LOCAL_JSON=${CONF_DIR}/local/local.json
 PHAB_PREAMBLE=${CONF_DIR}/preamble.php
-PHAB_SSH_CONF=${CONF_DIR}/sshd_config
 
 PHAB_SSH_SHHH=${CONF_DIR}/ssh-secret
 
@@ -70,15 +69,14 @@ fi
 if [ ! -f ${PHAB_PREAMBLE} ]; then
     sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/preamble.php ${PHAB_PREAMBLE}
 fi
-if [ ! -f ${PHAB_SSH_CONF} ]; then
-    sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/sshd_config ${PHAB_SSH_CONF}
-fi
 
+# SSH files
 # NOTE: The phabricator-ssh-hook.sh file MUST be owned by root with 755 perms or SSHD will refuse it.
+mkdir -p ${PHAB_SSH_SHHH}
+rm -f /etc/ssh/sshd_config
+cp ${EXAMPLE_CONFIG_DIR}/sshd_config /etc/ssh/sshd_config
 cp ${EXAMPLE_CONFIG_DIR}/phabricator-ssh-hook.sh ${PHAB_SSH_HOOK}
 chmod 755 ${PHAB_SSH_HOOK}
-
-chown root:root -R ${PHAB_SSH_SHHH}
 
 # Make sure symlinks exist:
 # conf/local
@@ -96,9 +94,8 @@ echo "Running SQL Checks"
 ${PHAB_DIR}/bin/storage upgrade --force
 
 echo "Starting SSH Services"
-rm -f /etc/ssh/sshd_config # Prevent accidental startup without the Phabricator config
 mkdir -p /run/sshd
-/usr/sbin/sshd -f ${PHAB_SSH_CONF} -E/var/log/sshd_phabricator
+/usr/sbin/sshd -E/var/log/sshd_phabricator
 
 echo "Starting Phabricator"
 sudo -u ${USERNAME} ${PHAB_DIR}/bin/phd start
