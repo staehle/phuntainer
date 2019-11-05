@@ -54,10 +54,10 @@ cat /etc/group | grep ${USERNAME}:
 echo
 
 # Give ownership of directories
-chown -R ${USERNAME}:${USERNAME} /libphutil
-chown -R ${USERNAME}:${USERNAME} /arcanist
-chown -R ${USERNAME}:${USERNAME} /phabricator
-chown -R ${USERNAME}:${USERNAME} /PHPExcel
+# chown -R ${USERNAME}:${USERNAME} /libphutil
+# chown -R ${USERNAME}:${USERNAME} /arcanist
+# chown -R ${USERNAME}:${USERNAME} /phabricator
+# chown -R ${USERNAME}:${USERNAME} /PHPExcel
 chown -R ${USERNAME}:${USERNAME} ${REPO_DIR}
 
 # Configurations
@@ -80,11 +80,16 @@ fi
 chown root:root -R ${PHAB_SSH_SHHH}
 chmod 755 ${PHAB_SSH_HOOK}
 
-# Make sure symlinks exist for non-movable config items:
+# Make sure symlinks exist:
+# conf/local
 rm -rf ${PHAB_DIR}/conf/local
+ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
+# preamble.php
 rm -f ${PHAB_DIR}/support/preamble.php
-sudo -u ${USERNAME} ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
-sudo -u ${USERNAME} ln -s ${PHAB_PREAMBLE} ${PHAB_DIR}/support/preamble.php
+ln -s ${PHAB_PREAMBLE} ${PHAB_DIR}/support/preamble.php
+# For SSH, we're just going to replace the default config since Debian/Ubuntu have some weird init requirements:
+rm -f /etc/ssh/sshd_config
+ln -s ${PHAB_SSH_CONF} /etc/ssh/sshd_config
 
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host
@@ -94,7 +99,8 @@ echo "Running SQL Checks"
 ${PHAB_DIR}/bin/storage upgrade --force
 
 echo "Starting SSH Services"
-sshd -f ${PHAB_SSH_CONF}
+# /usr/sbin/sshd
+/etc/init.d/ssh start
 
 echo "Starting Phabricator"
 sudo -u ${USERNAME} ${PHAB_DIR}/bin/phd start
