@@ -96,8 +96,9 @@ echo "Running SQL Checks"
 ${PHAB_DIR}/bin/storage upgrade --force
 
 echo "Starting SSH Services"
-mkdir -p /run/ssh
-/usr/sbin/sshd -f ${PHAB_SSH_CONF} -E/var/log/sshd_phabricator
+rm -f /etc/ssh/sshd_config # Prevent accidental startup without the Phabricator config
+mkdir -p /run/sshd
+/usr/sbin/sshd -f ${PHAB_SSH_CONF} #-E/var/log/sshd_phabricator
 
 echo "Starting Phabricator"
 sudo -u ${USERNAME} ${PHAB_DIR}/bin/phd start
