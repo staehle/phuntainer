@@ -14,7 +14,8 @@ PHAB_PREAMBLE=${CONF_DIR}/preamble.php
 PHAB_SSH_CONF=${CONF_DIR}/sshd_config
 
 PHAB_SSH_SHHH=${CONF_DIR}/ssh-secret
-PHAB_SSH_HOOK=${PHAB_SSH_SHHH}/phabricator-ssh-hook.sh
+
+PHAB_SSH_HOOK=/etc/ssh/phabricator-ssh-hook.sh
 
 if [ -z "${DO_NOT_UPGRADE_ON_BOOT}" ]; then
     git -C /libphutil pull
@@ -72,13 +73,12 @@ fi
 if [ ! -f ${PHAB_SSH_CONF} ]; then
     sudo -u ${USERNAME} cp ${EXAMPLE_CONFIG_DIR}/sshd_config ${PHAB_SSH_CONF}
 fi
+
 # NOTE: The phabricator-ssh-hook.sh file MUST be owned by root with 755 perms or SSHD will refuse it.
-mkdir -p ${PHAB_SSH_SHHH}
-if [ ! -f ${PHAB_SSH_HOOK} ]; then
-    sudo cp ${EXAMPLE_CONFIG_DIR}/phabricator-ssh-hook.sh ${PHAB_SSH_HOOK}
-fi
-chown root:root -R ${PHAB_SSH_SHHH}
+cp ${EXAMPLE_CONFIG_DIR}/phabricator-ssh-hook.sh ${PHAB_SSH_HOOK}
 chmod 755 ${PHAB_SSH_HOOK}
+
+chown root:root -R ${PHAB_SSH_SHHH}
 
 # Make sure symlinks exist:
 # conf/local

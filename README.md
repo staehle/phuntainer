@@ -66,7 +66,6 @@ Your configuration directory should have this tree layout. If any items are miss
   * `preamble.php` -- Phabricator Preamble PHP file. This may not apply to your situation. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/configuring_preamble/)
   * `sshd_config` -- For Git SSHD usage. The default file should be enough for most scenarios, and exposes default SSH port 22. See [this page from Phabricator's documentation](https://secure.phabricator.com/book/phabricator/article/diffusion_hosting/)
   * `ssh-secret/` -- Also for SSHD, contains permission-sensitive items. This is the only directory owned by `root`.
-    * `phabricator-ssh-hook.sh` -- The Phabricator SSHD Hook file
 
 
 

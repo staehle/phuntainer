@@ -3,7 +3,7 @@
 
 # NOTE: Edit these to the correct values for your setup.
 
-AuthorizedKeysCommand /config/ssh-secret/phabricator-ssh-hook.sh
+AuthorizedKeysCommand /etc/ssh/phabricator-ssh-hook.sh
 AuthorizedKeysCommandUser ph
 AllowUsers ph
 
