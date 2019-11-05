@@ -25,6 +25,7 @@ RUN apt-get -q update \
 		python3-pygments \
 		sendmail \
 		subversion \
+		sudo \
 		unzip \
 		vim \
 		wget \
@@ -59,6 +60,7 @@ RUN mkdir -p /usr/local/etc/php/conf.d
 COPY files/opcache-recommended.ini /usr/local/etc/php/conf.d/opcache-recommended.ini
 COPY files/timezone.ini /usr/local/etc/php/conf.d/timezone.ini
 COPY files/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY files/phpexcel.ini /usr/local/etc/php/conf.d/phpexcel.ini
 
 # Install apache mod rewrite
 RUN a2enmod rewrite
@@ -67,23 +69,34 @@ RUN a2enmod rewrite
 RUN git clone --branch stable https://github.com/phacility/libphutil.git /libphutil
 RUN git clone --branch stable https://github.com/phacility/arcanist.git /arcanist
 RUN git clone --branch stable https://github.com/phacility/phabricator.git /phabricator
+RUN git clone https://www.github.com/PHPOffice/PHPExcel.git /PHPExcel
 
-# Let's Encrypt
-RUN git clone https://github.com/letsencrypt/letsencrypt /letsencrypt
-# cd /srv/letsencrypt
-# ./letsencrypt-auto-source/letsencrypt-auto --help
-# cd /
+# Phabricator user
+# www-data is default apache user and will reuse. 'ph' is new user for both VCS and PHD
+RUN mkdir -p /home/daemonuser
+RUN echo "ph:x:4321:4321:DaemonUser,,,:/home/daemonuser:/bin/bash" >> /etc/passwd
+RUN echo "ph:NP:18204:0:99999:7:::" >> /etc/shadow
+# Phabricator group, add apache user
+RUN echo "ph:!:4321:www-data" >> /etc/group
+# Add sudoers definitions
+RUN echo "ph ALL=(phd) SETENV: NOPASSWD: /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/git" >> /etc/sudoers
+RUN echo "www-data ALL=(phd) SETENV: NOPASSWD: /usr/bin/git-upload-pack, /usr/lib/git-core/git-http-backend, /usr/bin/git" >> /etc/sudoers
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default
 COPY files/site.conf /etc/apache2/sites-available/phab.conf
 RUN a2ensite phab
 
-COPY files/local.json /phabricator/conf/local/local.default
+# Configurations
+COPY files/local.json /phabricator/conf/example/local.json
+COPY files/preamble.php /phabricator/conf/example/preamble.php
+COPY files/sshd_config /phabricator/conf/example/sshd_config
+COPY files/phabricator-ssh-hook.sh /phabricator/conf/example/phabricator-ssh-hook.sh
 
+# Runtime
 ENV PATH "$PATH:/phabricator/bin"
 
-EXPOSE 22 80 443
+EXPOSE 80 443 22
 
 COPY files/phun.sh /phabricator/phun.sh
 
