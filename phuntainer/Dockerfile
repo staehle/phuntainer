@@ -74,9 +74,13 @@ RUN git clone https://www.github.com/PHPOffice/PHPExcel.git /PHPExcel
 # Phabricator user
 # www-data is default apache user and will reuse. 'ph' is new user for both VCS and PHD
 RUN mkdir -p /home/daemonuser
-RUN echo "ph:x:4321:4321:DaemonUser:/home/daemonuser:/bin/bash" >> /etc/passwd
+RUN echo "ph:x:4321:4321:DaemonUser,,,:/home/daemonuser:/bin/bash" >> /etc/passwd
+RUN echo "ph:NP:18204:0:99999:7:::" >> /etc/shadow
 # Phabricator group, add apache user
 RUN echo "ph:!:4321:www-data" >> /etc/group
+# Add sudoers definitions
+RUN echo "ph ALL=(phd) SETENV: NOPASSWD: /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/git" >> /etc/sudoers
+RUN echo "www-data ALL=(phd) SETENV: NOPASSWD: /usr/bin/git-upload-pack, /usr/lib/git-core/git-http-backend, /usr/bin/git" >> /etc/sudoers
 
 # Add Phabricator to Apache
 RUN a2dissite 000-default
