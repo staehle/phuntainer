@@ -87,9 +87,6 @@ ln -s ${CONF_DIR}/local ${PHAB_DIR}/conf/local
 # preamble.php
 rm -f ${PHAB_DIR}/support/preamble.php
 ln -s ${PHAB_PREAMBLE} ${PHAB_DIR}/support/preamble.php
-# For SSH, we're just going to replace the default config since Debian/Ubuntu have some weird init requirements:
-rm -f /etc/ssh/sshd_config
-ln -s ${PHAB_SSH_CONF} /etc/ssh/sshd_config
 
 echo "SQL server config:"
 ${PHAB_DIR}/bin/config get mysql.host
@@ -99,8 +96,8 @@ echo "Running SQL Checks"
 ${PHAB_DIR}/bin/storage upgrade --force
 
 echo "Starting SSH Services"
-# /usr/sbin/sshd
-/etc/init.d/ssh start
+mkdir -p /run/ssh
+/usr/sbin/sshd -f ${PHAB_SSH_CONF} -E/var/log/sshd_phabricator
 
 echo "Starting Phabricator"
 sudo -u ${USERNAME} ${PHAB_DIR}/bin/phd start
